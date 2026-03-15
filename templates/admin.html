@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Админ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_and_register.css') }}">
+</head>
+<body>
+    <main>
+        <div class="box">
+            <h1>Создание пользователя</h1>
+            <form id="login" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="formp1">
+                    <label for="login">Логин:</label>
+                    <input type="text" id="login" name="login" required>
+                    <br>
+                    <label for="firstname">Имя:</label>
+                    <input type="text" id="firstname" name="firstname" required>
+                    <br>
+                    <label for="lastname">Фамилия:</label>
+                    <input type="text" id="lastname" name="lastname" required>
+                    <br>
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                    <br>
+                    <label for="password2">Пароль повторно:</label>
+                    <input type="password" id="password2" name="password2" required>
+                    <br>
+                <div class="under_form">
+                    <button type="submit"><b>Создать</b></button>                    
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer>
+        
+    </footer> 
+</body>
+</html>

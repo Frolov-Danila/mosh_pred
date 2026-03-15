@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request, JWTManager
 from sqlalchemy import Column, Integer, String
 from datetime import timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,6 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 csrf = CSRFProtect(app)
 db = SQLAlchemy()
 db.init_app(app)
+jwt = JWTManager(app)
 
 #Объект Пользователя
 class User(db.Model):
@@ -31,7 +32,10 @@ class User(db.Model):
 
     id = Column(Integer, primary_key=True)
     login = Column(String, unique=True, nullable=False)
+    firstname = Column(String, nullable=False)
+    lastname = Column(String, nullable=False)
     password = Column(String, nullable=False) #Сохраняем хэш
+    role = Column(String, default='User')
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -40,18 +44,29 @@ class User(db.Model):
     def hash_password(password):
         return generate_password_hash(password, method='pbkdf2:sha256')
     
-    def get_token():
+    def get_token(self):
         return create_access_token(identity=str(self.id))
     
 
 @app.route('/')
 def main():
+    try:
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+
+        # if user.role == 'Admin':
+        #     return redirect(url_for('admin'))
+            
+    except Exception:
+        return redirect(url_for('auth'))
+
     return render_template('main.html')
 
 
 #!Авторизация пользователя
 @app.route("/login", methods=['GET', 'POST'])
-def login():
+def auth():
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
@@ -66,7 +81,7 @@ def login():
             
             return response
         else:
-            return redirect(url_for('login'))
+            return redirect(url_for('auth'))
     
     return render_template("auth.html")
 
@@ -78,30 +93,35 @@ def val_acc():
     return response
 
 #!Регистрация админом нового пользователя
-@app.route("/register", methods=['GET', 'POST'])
-@jwt_required
+@app.route("/admin", methods=['GET', 'POST'])
+@jwt_required()
 def admin():
+    user = User.query.get_or_404(get_jwt_identity())
+
+    if user.role != 'Admin':
+        abort(403)
+
     if request.method == 'POST':
         data = request.form
-        login = data.get("firstname")
+        login = data.get("login")
+        firstname = data.get("firstname")
+        lastname = data.get('lastname')
         password = data.get("password")
         password2 = data.get("password2")
 
         if password != password2:
-            flash("Пароли не совпадают.", "danger")
+            abort(400)
         
         if not all([login, password]):
-            flash("Введите все даннные", "danger")
+            abort(400)
         
         if User.query.filter_by(login=login).first():
-            flash("Пользователь уже зарегистрирован", "danger")
+            abort(400)
 
         else:
-            user = User(login=login, password=User.hash_password(password), role=data.get("role", "Student"))
+            user = User(login=login, password=User.hash_password(password), firstname=firstname, lastname=lastname)
             db.session.add(user)
             db.session.commit()
-        
-            flash("Пользователь успешно создан", "success")
     return render_template("admin.html")
 
 
@@ -109,7 +129,11 @@ if __name__ == '__main__':
     with app.app_context():
         db.drop_all()
         db.create_all() 
-    #TODO: Добавть автосоздание 1 админа
+        
+        #! Автосоздание суперадмина
+        admin = User(login='admin', password=User.hash_password('1234'), role='Admin', firstname='Данил', lastname='Колбасенко')
+        db.session.add(admin)
+        db.session.commit()
 
     app.run(host=app.config['HOST'],
             port=app.config['PORT'],
