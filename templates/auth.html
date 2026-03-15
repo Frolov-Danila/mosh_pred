@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Войти в аккаунт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_and_register.css') }}">
+</head>
+<body>
+    <main>
+        <div class="box">
+            <h1>Вход</h1>
+            <form method="POST" id="login">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="formp1">
+                    <label for="login">Login:</label>
+                    <input type="text" id="login" name="login" required>
+                    <br>
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                    <br>
+                </div>
+                <div class="under_form">
+                    <button type="submit"><b>Войти</b></button>                    
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer>
+        
+    </footer> 
+</body>
+</html>
