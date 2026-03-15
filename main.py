@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -70,6 +70,12 @@ def login():
     
     return render_template("auth.html")
 
+@app.route("/valid_accuracy")
+def val_acc():
+    html_content = open("templates/val_acc.html", "r")
+    response = make_response(html_content, 200) # 200 is the status code
+    response.mimetype = 'text/html'
+    return response
 
 #!Регистрация админом нового пользователя
 @app.route("/register", methods=['GET', 'POST'])
