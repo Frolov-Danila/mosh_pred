@@ -1,5 +1,4 @@
 import numpy as np
-import json
 
 data = np.load("Data.npz")
 
@@ -17,13 +16,12 @@ for i in train_y:
         if j.isupper():
             flag = True
         if flag:
-            if not(j.isalpha()):
-                flag = False
-                continue
             res += j
     decode_massive.append(res)
     if not(res in decode_set):
         decode_set.append(res)
     
-for i in range(6):
-    decode_dict[i] = decode_set[i]
+for i in range(len(decode_set)):
+    decode_dict[decode_set[i]] = i
+
+print(decode_dict)
