@@ -61,7 +61,7 @@ def main():
     except Exception:
         return redirect(url_for('auth'))
 
-    return render_template('main.html')
+    return render_template('main.html', user=user)
 
 
 #!Авторизация пользователя

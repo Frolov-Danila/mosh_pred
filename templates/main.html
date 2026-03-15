@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная</title>
+    <title>Пользовательская панель</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    
+    <!-- Информация о пользователе -->
+    <div class="user-info">
+        <h1>{{ user.firstname }} {{ user.lastname }}</h1>
+        <p><strong>Логин:</strong> {{ user.login }}</p>
+    </div>
+
+    <!-- Поле загрузки документа -->
+    <div class="upload-section">
+        <h2>Загрузка документа</h2>
+        <div class="upload-area">
+            <input type="file" id="fileInput" accept=".npz" style="display: none;">
+            <label for="fileInput" style="cursor: pointer; display: block;">
+                <p>Нажмите или перетащите файл сюда</p>
+                <p style="font-size: 14px; color: #666; margin-top: 5px;">Поддерживаемые формат: .npz</p>
+            </label>
+        </div>
+    </div>
+
+    <!-- 4 горизонтальные ссылки -->
+    <div class="links">
+        <a href="valid_accuracy" class="link-btn">График точности данных</a>
+        <a href="#" class="link-btn">Диаграмма кол-ва записей в каждом классе</a>
+        <a href="#" class="link-btn">Диаграмма точности определения каждой записи</a>
+        <a href="#" class="link-btn">Диаграмма с топ 5 часто встречающихся классов</a>
+    </div>
 </body>
 </html>
